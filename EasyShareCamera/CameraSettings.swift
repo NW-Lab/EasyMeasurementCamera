@@ -24,7 +24,6 @@ class CameraSettings: ObservableObject {
     // 撮影モード
     @Published var captureMode: CaptureMode = .photo
     @Published var videoQuality: AVCaptureSession.Preset = .high
-    @Published var isSlowMotionEnabled: Bool = false
     
     // MARK: - UserDefaults Keys
     private enum SettingsKey: String {
@@ -38,7 +37,6 @@ class CameraSettings: ObservableObject {
         case whiteBalanceMode = "cameraSettings.whiteBalanceMode"
         case captureMode = "cameraSettings.captureMode"
         case videoQuality = "cameraSettings.videoQuality"
-        case isSlowMotionEnabled = "cameraSettings.isSlowMotionEnabled"
     }
     
     // MARK: - Initializer
@@ -77,8 +75,6 @@ class CameraSettings: ObservableObject {
             // AVCaptureSession.Preset(rawValue:) returns a Preset (non-optional), so assign directly.
             videoQuality = AVCaptureSession.Preset(rawValue: videoQualityRaw)
         }
-        
-        isSlowMotionEnabled = defaults.bool(forKey: SettingsKey.isSlowMotionEnabled.rawValue)
     }
     
     /// 設定を UserDefaults に保存
@@ -94,8 +90,7 @@ class CameraSettings: ObservableObject {
         defaults.set(exposureMode.rawValue, forKey: SettingsKey.exposureMode.rawValue)
         defaults.set(whiteBalanceMode.rawValue, forKey: SettingsKey.whiteBalanceMode.rawValue)
         defaults.set(captureMode.rawValue, forKey: SettingsKey.captureMode.rawValue)
-    defaults.set(videoQuality.rawValue, forKey: SettingsKey.videoQuality.rawValue)
-        defaults.set(isSlowMotionEnabled, forKey: SettingsKey.isSlowMotionEnabled.rawValue)
+        defaults.set(videoQuality.rawValue, forKey: SettingsKey.videoQuality.rawValue)
     }
     
     /// 設定をデフォルト値にリセット
@@ -110,7 +105,6 @@ class CameraSettings: ObservableObject {
         whiteBalanceMode = .autoWhiteBalance
         captureMode = .photo
         videoQuality = .high
-        isSlowMotionEnabled = false
         
         saveSettings()
     }
@@ -173,8 +167,7 @@ extension UserDefaults {
             "cameraSettings.exposureMode",
             "cameraSettings.whiteBalanceMode",
             "cameraSettings.captureMode",
-            "cameraSettings.videoQuality",
-            "cameraSettings.isSlowMotionEnabled"
+            "cameraSettings.videoQuality"
         ]
         
         keys.forEach { removeObject(forKey: $0) }

@@ -9,15 +9,20 @@ import SwiftUI
 import AVFoundation
 
 struct CameraView: View {
-    @StateObject private var cameraSettings = CameraSettings()
+    @StateObject private var cameraSettings: CameraSettings
     @StateObject private var cameraManager: CameraManager
-    @State private var showingSettings = false
+    @State private var showingMasterSettings = false
+    @State private var showingLocalSettings = false
     @State private var showingAlert = false
+    @State private var recordingDuration: TimeInterval = 0
+    @State private var recordingTimer: Timer?
+    @State private var lastZoomFactor: CGFloat = 1.0
+    @State private var availableZoomFactors: [CGFloat] = []
     
     init() {
         let settings = CameraSettings()
-        let manager = CameraManager(settings: settings)
-        _cameraManager = StateObject(wrappedValue: manager)
+        _cameraSettings = StateObject(wrappedValue: settings)
+        _cameraManager = StateObject(wrappedValue: CameraManager(settings: settings))
     }
     
     var body: some View {
@@ -27,6 +32,22 @@ struct CameraView: View {
             if cameraManager.hasPermission {
                 CameraPreviewView(session: cameraManager.captureSession)
                     .ignoresSafeArea()
+                    .gesture(
+                        MagnificationGesture()
+                            .onChanged { value in
+                                guard let device = cameraManager.captureDevice else { return }
+                                // 段階的拡大: 1→2→4→8倍のような感じに
+                                let sensitivity: CGFloat = 0.2  // より感度を下げる
+                                let logScale = log2(value) * sensitivity  // 対数スケールで段階的に
+                                let newZoom = lastZoomFactor * pow(2.0, logScale)
+                                let maxPracticalZoom = min(device.maxAvailableVideoZoomFactor, 10.0)
+                                let clampedZoom = min(max(newZoom, device.minAvailableVideoZoomFactor), maxPracticalZoom)
+                                cameraManager.zoom(by: clampedZoom)
+                            }
+                            .onEnded { _ in
+                                lastZoomFactor = cameraSettings.zoomFactor
+                            }
+                    )
                     .onTapGesture { location in
                         let point = CGPoint(x: location.x / UIScreen.main.bounds.width,
                                           y: location.y / UIScreen.main.bounds.height)
@@ -52,8 +73,16 @@ struct CameraView: View {
         }
         .onAppear {
             print("📱 [CameraView] onAppear - hasPermission: \(cameraManager.hasPermission)")
+            lastZoomFactor = cameraSettings.zoomFactor
+            
             if cameraManager.hasPermission {
                 cameraManager.startSession()
+                // セッション開始後にズーム倍率を取得
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    if availableZoomFactors.isEmpty {
+                        availableZoomFactors = cameraManager.getAvailableZoomFactors()
+                    }
+                }
             } else {
                 print("📱 [CameraView] No camera permission yet")
             }
@@ -74,91 +103,142 @@ struct CameraView: View {
             print("📱 [CameraView] Permission changed to: \(newValue)")
             if newValue {
                 cameraManager.startSession()
+                // 権限許可後にズーム倍率を取得
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    if availableZoomFactors.isEmpty {
+                        availableZoomFactors = cameraManager.getAvailableZoomFactors()
+                    }
+                }
             } else {
                 cameraManager.stopSession()
             }
         }
-        .sheet(isPresented: $showingSettings) {
-            CameraSettingsView(settings: cameraSettings, cameraManager: cameraManager)
+        .onChange(of: cameraManager.isRecording) { _, isRecording in
+            if isRecording {
+                startRecordingTimer()
+            } else {
+                stopRecordingTimer()
+            }
+        }
+        .onChange(of: cameraSettings.zoomFactor) { _, newValue in
+            lastZoomFactor = newValue
+        }
+        .sheet(isPresented: $showingMasterSettings) {
+            MasterSettingsView(settings: cameraSettings, cameraManager: cameraManager)
+        }
+        .sheet(isPresented: $showingLocalSettings) {
+            LocalSettingsView(settings: cameraSettings, cameraManager: cameraManager)
         }
     }
     
     // MARK: - Top Controls
     private var topControls: some View {
         HStack {
-            // 設定ボタン
-            Button(action: { showingSettings = true }) {
-                Image(systemName: "gearshape.fill")
-                    .foregroundColor(.white)
-                    .font(.title2)
-                    .padding(12)
-                    .background(Color.black.opacity(0.3))
-                    .clipShape(Circle())
+            // マスター設定ボタン
+            Button(action: { showingMasterSettings = true }) {
+                VStack(spacing: 2) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.title3)
+                    Text("Master")
+                        .font(.caption2)
+                }
+                .foregroundColor(.white)
+                .padding(8)
+                .background(Color.black.opacity(0.3))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             }
             
             Spacer()
             
-            // 撮影モード表示
-            Text(cameraSettings.captureMode.displayName)
-                .foregroundColor(.white)
-                .font(.headline)
+            // 中央エリア: マスター表示とモード表示
+            VStack(spacing: 4) {
+                Text("MASTER")
+                    .foregroundColor(.yellow)
+                    .font(.caption)
+                    .bold()
+                
+                HStack(spacing: 8) {
+                    Text(cameraSettings.captureMode.displayName)
+                        .foregroundColor(.white)
+                        .font(.headline)
+                    
+                    // 録画時間表示（録画中のみ）
+                    if cameraManager.isRecording {
+                        Text(formatDuration(recordingDuration))
+                            .foregroundColor(.red)
+                            .font(.headline)
+                            .monospacedDigit()
+                    }
+                }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(Color.black.opacity(0.3))
                 .clipShape(Capsule())
+            }
             
             Spacer()
             
-            // フラッシュボタン
-            Button(action: toggleFlash) {
-                Image(systemName: flashIconName)
-                    .foregroundColor(.white)
-                    .font(.title2)
-                    .padding(12)
-                    .background(Color.black.opacity(0.3))
-                    .clipShape(Circle())
+            // ローカル設定ボタン
+            Button(action: { showingLocalSettings = true }) {
+                VStack(spacing: 2) {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.title3)
+                    Text("Local")
+                        .font(.caption2)
+                }
+                .foregroundColor(.white)
+                .padding(8)
+                .background(Color.black.opacity(0.3))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             }
         }
     }
     
     // MARK: - Bottom Controls
     private var bottomControls: some View {
-        VStack(spacing: 20) {
-            // ズームスライダー
-            if cameraSettings.zoomFactor > 1.0 {
-                HStack {
-                    Text("1×")
-                        .foregroundColor(.white)
-                        .font(.caption)
-                    
-                    Slider(value: Binding(
-                        get: { cameraSettings.zoomFactor },
-                        set: { newValue in
-                            cameraSettings.zoomFactor = newValue
-                            cameraManager.zoom(by: newValue)
+        VStack(spacing: 16) {
+            // ズーム倍率表示とボタン
+            VStack(spacing: 12) {
+                // 現在のズーム倍率表示
+                Text(String(format: "%.1fx", cameraSettings.zoomFactor))
+                    .foregroundColor(.white)
+                    .font(.title3)
+                    .bold()
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
+                    .background(Color.black.opacity(0.5))
+                    .clipShape(Capsule())
+                
+                // キリの良い倍率ボタン
+                HStack(spacing: 12) {
+                    ForEach(availableZoomFactors, id: \.self) { factor in
+                        Button(action: {
+                            cameraManager.zoom(by: factor)
+                        }) {
+                            Text(formatZoomFactor(factor))
+                                .foregroundColor(.white)
+                                .font(.callout)
+                                .bold()
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color.black.opacity(0.5))
+                                .clipShape(Capsule())
+                                .overlay(
+                                    Capsule()
+                                        .stroke(Color.white, lineWidth: abs(cameraSettings.zoomFactor - factor) < 0.1 ? 2 : 0)
+                                )
                         }
-                    ), in: 1.0...10.0, step: 0.1)
-                    .accentColor(.yellow)
-                    
-                    Text("10×")
-                        .foregroundColor(.white)
-                        .font(.caption)
+                        .buttonStyle(.plain)
+                    }
                 }
-                .padding(.horizontal, 40)
             }
             
-            HStack(spacing: 60) {
-                // 撮影モード切り替え
-                Button(action: switchCaptureMode) {
-                    Image(systemName: captureModeIcon)
-                        .foregroundColor(.white)
-                        .font(.title)
-                        .padding(20)
-                        .background(Color.black.opacity(0.3))
-                        .clipShape(Circle())
-                }
+            // シャッターボタン
+            HStack(spacing: 0) {
+                // 左側のスペーサー
+                Spacer()
                 
-                // メインシャッターボタン
+                // メインシャッターボタン（中央）
                 Button(action: mainCaptureAction) {
                     ZStack {
                         Circle()
@@ -180,15 +260,8 @@ struct CameraView: View {
                 .scaleEffect(cameraManager.isRecording ? 1.1 : 1.0)
                 .animation(.easeInOut(duration: 0.1), value: cameraManager.isRecording)
                 
-                // 設定クイックアクセス
-                Button(action: { showingSettings = true }) {
-                    Image(systemName: "slider.horizontal.3")
-                        .foregroundColor(.white)
-                        .font(.title)
-                        .padding(20)
-                        .background(Color.black.opacity(0.3))
-                        .clipShape(Circle())
-                }
+                // 右側のスペーサー
+                Spacer()
             }
         }
     }
@@ -221,30 +294,6 @@ struct CameraView: View {
     }
     
     // MARK: - Computed Properties
-    private var flashIconName: String {
-        switch cameraSettings.flashMode {
-        case .off:
-            return "bolt.slash.fill"
-        case .on:
-            return "bolt.fill"
-        case .auto:
-            return "bolt.badge.a.fill"
-        @unknown default:
-            return "bolt.slash.fill"
-        }
-    }
-    
-    private var captureModeIcon: String {
-        switch cameraSettings.captureMode {
-        case .photo:
-            return "camera.fill"
-        case .video:
-            return "video.fill"
-        case .slowMotion:
-            return "slowmo"
-        }
-    }
-    
     private var captureButtonColor: Color {
         switch cameraSettings.captureMode {
         case .photo:
@@ -255,38 +304,40 @@ struct CameraView: View {
     }
     
     // MARK: - Actions
-    private func toggleFlash() {
-        switch cameraSettings.flashMode {
-        case .off:
-            cameraSettings.flashMode = .auto
-        case .auto:
-            cameraSettings.flashMode = .on
-        case .on:
-            cameraSettings.flashMode = .off
-        @unknown default:
-            cameraSettings.flashMode = .off
-        }
-        cameraSettings.saveSettings()
-    }
-    
-    private func switchCaptureMode() {
-        switch cameraSettings.captureMode {
-        case .photo:
-            cameraSettings.captureMode = .video
-        case .video:
-            cameraSettings.captureMode = .slowMotion
-        case .slowMotion:
-            cameraSettings.captureMode = .photo
-        }
-        cameraSettings.saveSettings()
-    }
-    
     private func mainCaptureAction() {
         switch cameraSettings.captureMode {
         case .photo:
             cameraManager.capturePhoto()
         case .video, .slowMotion:
             cameraManager.toggleRecording()
+        }
+    }
+    
+    private func startRecordingTimer() {
+        recordingDuration = 0
+        recordingTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+            recordingDuration += 0.1
+        }
+    }
+    
+    private func stopRecordingTimer() {
+        recordingTimer?.invalidate()
+        recordingTimer = nil
+        recordingDuration = 0
+    }
+    
+    private func formatDuration(_ duration: TimeInterval) -> String {
+        let minutes = Int(duration) / 60
+        let seconds = Int(duration) % 60
+        let deciseconds = Int((duration.truncatingRemainder(dividingBy: 1)) * 10)
+        return String(format: "%02d:%02d.%01d", minutes, seconds, deciseconds)
+    }
+    
+    private func formatZoomFactor(_ factor: CGFloat) -> String {
+        if factor == floor(factor) {
+            return String(format: "%.0fx", factor)
+        } else {
+            return String(format: "%.1fx", factor)
         }
     }
 }

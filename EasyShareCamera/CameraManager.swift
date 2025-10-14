@@ -81,6 +81,10 @@ class CameraManager: NSObject, ObservableObject {
             if !self.captureSession.isRunning {
                 print("🎥 [CameraManager] Starting capture session...")
                 self.captureSession.startRunning()
+                
+                // セッション開始後にズーム倍率キャッシュをリセット
+                self.resetZoomFactorsCache()
+                
                 DispatchQueue.main.async {
                     self.isSessionRunning = true
                     print("🎥 [CameraManager] Session is now running")
@@ -178,17 +182,47 @@ class CameraManager: NSObject, ObservableObject {
     func zoom(by factor: CGFloat) {
         guard let device = captureDevice else { return }
         
-        let newZoomFactor = max(device.minAvailableVideoZoomFactor,
-                               min(device.maxAvailableVideoZoomFactor, factor))
+        // iOS 18: 0.5x の特別処理
+        var targetZoomFactor = factor
+        if #available(iOS 18.0, *) {
+            if factor == 0.5 && device.isVirtualDevice {
+                // iOS 18 では minAvailableVideoZoomFactor が 1.0 でも、実際には 0.5x が可能
+                print("🎥 [CameraManager] iOS 18: Attempting 0.5x zoom on virtual device")
+                targetZoomFactor = 0.5
+            }
+        }
+        
+        // 実用的な範囲に制限（最大10倍まで、0.5x は特別許可）
+        let maxPracticalZoom = min(device.maxAvailableVideoZoomFactor, 10.0)
+        let minZoomFactor = (targetZoomFactor == 0.5) ? 0.5 : device.minAvailableVideoZoomFactor
+        let newZoomFactor = max(minZoomFactor,
+                               min(maxPracticalZoom, targetZoomFactor))
         
         sessionQueue.async {
             do {
                 try device.lockForConfiguration()
-                device.videoZoomFactor = newZoomFactor
+                
+                // iOS 18 での 0.5x 問題対策：まず try-catch で安全に実行
+                var actualZoomFactor = newZoomFactor
+                do {
+                    device.videoZoomFactor = newZoomFactor
+                    print("🎥 [CameraManager] ✅ Zoom set to: \(newZoomFactor)x (requested: \(factor)x)")
+                } catch {
+                    // 0.5x が失敗した場合、minZoom に設定してフォールバック
+                    if newZoomFactor < device.minAvailableVideoZoomFactor {
+                        actualZoomFactor = device.minAvailableVideoZoomFactor
+                        device.videoZoomFactor = actualZoomFactor
+                        print("🎥 [CameraManager] ⚠️ \(newZoomFactor)x failed, fallback to \(actualZoomFactor)x")
+                        print("🎥 [CameraManager] Error: \(error.localizedDescription)")
+                    } else {
+                        throw error // 他のエラーは再スローする
+                    }
+                }
+                
                 device.unlockForConfiguration()
                 
                 DispatchQueue.main.async {
-                    self.settings.zoomFactor = newZoomFactor
+                    self.settings.zoomFactor = actualZoomFactor
                     self.settings.saveSettings()
                 }
             } catch {
@@ -197,6 +231,100 @@ class CameraManager: NSObject, ObservableObject {
                 }
             }
         }
+    }
+    
+    // キャッシュされたズーム倍率
+    private var cachedZoomFactors: [CGFloat]?
+    
+    /// ズーム倍率キャッシュをリセット（セッション変更時など）
+    func resetZoomFactorsCache() {
+        cachedZoomFactors = nil
+        print("🎥 [CameraManager] Zoom factors cache reset")
+    }
+    
+    /// 利用可能なズーム倍率のリストを取得（キャッシュ版）
+    func getAvailableZoomFactors() -> [CGFloat] {
+        // 既にキャッシュされている場合はそれを返す
+        if let cached = cachedZoomFactors {
+            return cached
+        }
+        
+        guard let device = captureDevice else { 
+            cachedZoomFactors = [1.0]
+            return [1.0] 
+        }
+        
+        let minZoom = device.minAvailableVideoZoomFactor
+        let maxZoom = min(device.maxAvailableVideoZoomFactor, 10.0) // 実用的な最大値を10倍に制限
+        
+        print("🎥 [CameraManager] Device: \(device.localizedName)")
+        print("🎥 [CameraManager] Device type: \(device.deviceType.rawValue)")
+        print("🎥 [CameraManager] Zoom range: \(minZoom) ~ \(device.maxAvailableVideoZoomFactor) (limited to \(maxZoom))")
+        print("🎥 [CameraManager] Is virtual device: \(device.isVirtualDevice)")
+        if #available(iOS 13.0, *) {
+            print("🎥 [CameraManager] Constituent devices: \(device.constituentDevices.count)")
+        }
+        
+        // iOS 18 では、仮想デバイスでも 0.5x が minZoomFactor に反映されない問題があるため
+        // 強制的に 0.5x を含める（iOS 18 対応）
+        var candidates: [CGFloat] = []
+        
+        if #available(iOS 18.0, *) {
+            // iOS 18: Virtual Device または UltraWideCamera の場合に 0.5x を追加
+            if device.isVirtualDevice {
+                // Virtual Device の場合：constituent devices をチェック
+                let hasUltraWide = device.constituentDevices.contains { $0.deviceType == .builtInUltraWideCamera }
+                if hasUltraWide {
+                    candidates = [0.5, 1.0, 3.0]
+                    print("🎥 [CameraManager] iOS 18: Virtual device with ultra-wide support")
+                } else {
+                    candidates = [1.0, 3.0]
+                    print("🎥 [CameraManager] iOS 18: Virtual device without ultra-wide")
+                }
+            } else if device.deviceType == .builtInUltraWideCamera {
+                // Physical UltraWideCamera の場合（フォールバック用）
+                candidates = [0.5, 1.0, 3.0]
+                print("🎥 [CameraManager] iOS 18: Physical ultra-wide camera (fallback mode)")
+            } else {
+                candidates = [1.0, 3.0]
+                print("🎥 [CameraManager] iOS 18: Regular camera without ultra-wide")
+            }
+        } else {
+            // iOS 17 以前: 従来通り
+            candidates = [0.5, 1.0, 3.0]
+        }
+        
+        // デバイスがサポートする範囲内の倍率のみを返す
+        let availableFactors = candidates.filter { factor in
+            // iOS 18 での 0.5x 特別処理：Virtual Device または UltraWideCamera なら 0.5x を許可
+            if #available(iOS 18.0, *), factor == 0.5 {
+                if device.isVirtualDevice {
+                    let hasUltraWide = device.constituentDevices.contains { $0.deviceType == .builtInUltraWideCamera }
+                    if hasUltraWide {
+                        print("🎥 [CameraManager] ✅ \(factor)x is ALLOWED for iOS 18 virtual device with ultra-wide")
+                        return true
+                    }
+                } else if device.deviceType == .builtInUltraWideCamera {
+                    print("🎥 [CameraManager] ✅ \(factor)x is ALLOWED for iOS 18 physical ultra-wide camera")
+                    return true
+                }
+            }
+            
+            let isSupported = factor >= (minZoom - 0.01) && factor <= (maxZoom + 0.01)  // 少し余裕を持たせる
+            if isSupported {
+                print("🎥 [CameraManager] ✅ \(factor)x is supported")
+            } else {
+                print("🎥 [CameraManager] ❌ \(factor)x is not supported (range: \(minZoom)~\(maxZoom))")
+            }
+            return isSupported
+        }.sorted()
+        
+        print("🎥 [CameraManager] Final available zoom factors: \(availableFactors)")
+        
+        // キャッシュに保存
+        cachedZoomFactors = availableFactors
+        
+        return availableFactors
     }
     
     /// フォーカスポイント設定
@@ -253,21 +381,69 @@ private extension CameraManager {
         print("🎥 [CameraManager] configureCaptureSession() - starting configuration")
         captureSession.beginConfiguration()
         
-        // セッション品質設定
-        if captureSession.canSetSessionPreset(settings.videoQuality) {
+        // セッション品質設定（超広角アクセスのため inputPriority を試す）
+        if captureSession.canSetSessionPreset(.inputPriority) {
+            captureSession.sessionPreset = .inputPriority
+            print("🎥 [CameraManager] Session preset set to: inputPriority (for ultra-wide access)")
+        } else if captureSession.canSetSessionPreset(settings.videoQuality) {
             captureSession.sessionPreset = settings.videoQuality
             print("🎥 [CameraManager] Session preset set to: \(settings.videoQuality.rawValue)")
         }
         
-        // ビデオデバイス設定
-        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
+        // ビデオデバイス設定: iOS 18対応（Virtual Device を優先）
+        let deviceTypes: [AVCaptureDevice.DeviceType]
+        if #available(iOS 18.0, *) {
+            deviceTypes = [
+                .builtInTripleCamera,      // iOS 18: Virtual Device を優先（安定した超広角アクセス）
+                .builtInDualWideCamera,    // iPhone 13, 14 など
+                .builtInUltraWideCamera,   // Physical Device は後回し
+                .builtInDualCamera,        // iPhone 12 Pro など
+                .builtInWideAngleCamera    // 古い機種用
+            ]
+        } else {
+            deviceTypes = [
+                .builtInUltraWideCamera,   // iOS 17以前: Physical Device を優先
+                .builtInTripleCamera,      // iPhone 13 Pro, 14 Pro など
+                .builtInDualWideCamera,    // iPhone 13, 14 など
+                .builtInDualCamera,        // iPhone 12 Pro など
+                .builtInWideAngleCamera    // 古い機種用
+            ]
+        }
+        
+        let discoverySession = AVCaptureDevice.DiscoverySession(
+            deviceTypes: deviceTypes,
+            mediaType: .video,
+            position: .back
+        )
+        
+        // 利用可能なデバイスを全てログ出力
+        print("🎥 [CameraManager] Available devices:")
+        for (index, device) in discoverySession.devices.enumerated() {
+            print("🎥 [CameraManager] Device \(index): \(device.localizedName) (type: \(device.deviceType.rawValue))")
+            print("🎥 [CameraManager] - Zoom range: \(device.minAvailableVideoZoomFactor) ~ \(device.maxAvailableVideoZoomFactor)")
+        }
+        
+        guard let videoDevice = discoverySession.devices.first else {
             print("🎥 [CameraManager] ❌ Failed to get video device")
             DispatchQueue.main.async {
                 self.alertError = AlertError(message: "カメラデバイスが見つかりません")
             }
             return
         }
-        print("🎥 [CameraManager] Got video device: \(videoDevice.localizedName)")
+        
+        print("🎥 [CameraManager] Got video device: \(videoDevice.localizedName) (type: \(videoDevice.deviceType.rawValue))")
+        print("🎥 [CameraManager] Zoom range: \(videoDevice.minAvailableVideoZoomFactor) ~ \(videoDevice.maxAvailableVideoZoomFactor)")
+        print("🎥 [CameraManager] Device capabilities:")
+        print("🎥 [CameraManager] - hasFlash: \(videoDevice.hasFlash)")
+        print("🎥 [CameraManager] - hasTorch: \(videoDevice.hasTorch)")
+        print("🎥 [CameraManager] - isVirtualDevice: \(videoDevice.isVirtualDevice)")
+        if #available(iOS 13.0, *) {
+            print("🎥 [CameraManager] - constituentDevices count: \(videoDevice.constituentDevices.count)")
+            for (index, device) in videoDevice.constituentDevices.enumerated() {
+                print("🎥 [CameraManager] - Component \(index): \(device.localizedName) (type: \(device.deviceType.rawValue))")
+                print("🎥 [CameraManager] - Component zoom: \(device.minAvailableVideoZoomFactor) ~ \(device.maxAvailableVideoZoomFactor)")
+            }
+        }
         
         do {
             let videoDeviceInput = try AVCaptureDeviceInput(device: videoDevice)
