@@ -70,7 +70,25 @@ EasyShareCameraは、水滴が液面に落下して形成される「ミルク�
 
 詳細は [DEVELOPMENT.md](DEVELOPMENT.md) を参照。
 
-### 2. Arduinoトリガーシステム
+### 2. 水滴供給システム
+
+水滴を安定して供給するために、2つの方式を提供しています：
+
+#### 方式1: 自然落下（マリオット瓶 + 点滴セット）
+
+- **特徴**: シンプル、プログラミング不要
+- **コスト**: 約1,200円
+- **推奨用途**: 最初のテスト、学習用
+
+#### 方式2: 電磁弁制御
+
+- **特徴**: 高精度、柔軟な制御
+- **コスト**: 約4,000〜4,700円
+- **推奨用途**: イベント、高度な撮影
+
+詳細は [docs/WATER_SYSTEM_GUIDE.md](docs/WATER_SYSTEM_GUIDE.md) を参照。
+
+### 3. Arduinoトリガーシステム
 
 #### 必要な部品
 
@@ -188,6 +206,9 @@ EasyShareCamera/
 │   ├── RedLightDetector.swift
 │   ├── ContentView.swift
 │   └── ...
+├── docs/                    # ドキュメント
+│   ├── WATER_SYSTEM_GUIDE.md
+│   └── MARIOTTE_BOTTLE_GUIDE.md
 ├── arduino/                  # Arduinoトリガーシステム
 │   ├── water_drop_trigger/
 │   │   └── water_drop_trigger.ino
