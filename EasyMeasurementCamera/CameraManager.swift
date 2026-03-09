@@ -524,31 +524,41 @@ extension CameraManager: AVCaptureFileOutputRecordingDelegate {
     }
 
     private func schedulePreview(for url: URL, retries: Int) {
-        if isFileReady(at: url) {
-            DispatchQueue.main.async {
-                self.lastRecordedURL = url
+        Task { [weak self] in
+            guard let self = self else { return }
+
+            if await self.isFileReady(at: url) {
+                await MainActor.run {
+                    self.lastRecordedURL = url
+                }
+                return
             }
-            return
-        }
 
-        guard retries > 0 else {
-            print("⚠️ [CameraManager] Preview file not ready: \(url.lastPathComponent)")
-            return
-        }
+            guard retries > 0 else {
+                print("⚠️ [CameraManager] Preview file not ready: \(url.lastPathComponent)")
+                return
+            }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-            self?.schedulePreview(for: url, retries: retries - 1)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+                self?.schedulePreview(for: url, retries: retries - 1)
+            }
         }
     }
 
-    private func isFileReady(at url: URL) -> Bool {
+    private func isFileReady(at url: URL) async -> Bool {
         guard FileManager.default.fileExists(atPath: url.path) else { return false }
         guard let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
               let size = attrs[.size] as? NSNumber else { return false }
         guard size.intValue > 0 else { return false }
 
         let asset = AVURLAsset(url: url)
-        return asset.isPlayable && !asset.duration.isIndefinite
+        do {
+            let playable = try await asset.load(.isPlayable)
+            let duration = try await asset.load(.duration)
+            return playable && !duration.isIndefinite
+        } catch {
+            return false
+        }
     }
 }
 
