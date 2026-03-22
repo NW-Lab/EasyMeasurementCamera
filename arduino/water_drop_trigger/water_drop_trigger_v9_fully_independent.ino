@@ -9,7 +9,7 @@
 
 // Pin Definitions for Seeed XIAO SAMD21
 const int PHOTO_SENSOR_PIN = A0;      // D0
-const int AMBIENT_LIGHT_PIN = A1;     // D1
+
 const int NEOPIXEL_PIN = D2;          // D2
 
 // TLC5916 #1 (RED) Control Pins
@@ -77,7 +77,7 @@ void setup() {
 
   // Sensor & NeoPixel Pins
   pinMode(PHOTO_SENSOR_PIN, INPUT_PULLUP);
-  pinMode(AMBIENT_LIGHT_PIN, INPUT);
+  
   pixels.begin();
   pixels.setBrightness(150);
   pixels.show();
