@@ -37,7 +37,8 @@ enum State { IDLE, RECORDING, COOLDOWN };
 State currentState = IDLE;
 unsigned long triggerTime = 0;
 
-Adafruit_NeoPixel pixels(NUM_NEOPIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+// SK6812 is an RGBW type LED. Use NEO_GRBW for correct color handling.
+Adafruit_NeoPixel pixels(NUM_NEOPIXELS, NEOPIXEL_PIN, NEO_GRBW + NEO_KHZ800);
 
 // -----------------------------------------------------------------------------
 // Bit-Banging Shift Register Control
