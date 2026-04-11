@@ -1,0 +1,853 @@
+{
+  "sourceLanguage" : "ja",
+  "strings" : {
+    "「撮影準備」ボタンをタップします" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap the \"Arm\" button."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「撮影準備」ボタンをタップします"
+          }
+        }
+      }
+    },
+    "%.1fcm" : {
+
+    },
+    "%.1fx" : {
+
+    },
+    "%lld%%" : {
+
+    },
+    "• カメラは必ず固定してください（手持ち撮影は非推奨）" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Keep the camera fixed (handheld shooting is not recommended)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• カメラは必ず固定してください（手持ち撮影は非推奨）"
+          }
+        }
+      }
+    },
+    "• 初回撮影前に写真ライブラリへのアクセスを許可してください" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Allow access to Photos before the first capture."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• 初回撮影前に写真ライブラリへのアクセスを許可してください"
+          }
+        }
+      }
+    },
+    "• 撮影環境は暗めにし、赤色LEDを明確に検知できるようにしてください" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Dim the environment so the red LED can be detected clearly."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• 撮影環境は暗めにし、赤色LEDを明確に検知できるようにしてください"
+          }
+        }
+      }
+    },
+    "• 赤色LED以外の強い光源（赤い照明など）は避けてください" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Avoid strong light sources other than the red LED (e.g., red lighting)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• 赤色LED以外の強い光源（赤い照明など）は避けてください"
+          }
+        }
+      }
+    },
+    "0.5x" : {
+
+    },
+    "0.25x" : {
+
+    },
+    "1.0" : {
+
+    },
+    "1.0x" : {
+
+    },
+    "1ショット" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Single"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1ショット"
+          }
+        }
+      }
+    },
+    "1回" : {
+
+    },
+    "1秒" : {
+
+    },
+    "2回" : {
+
+    },
+    "2秒" : {
+
+    },
+    "3回" : {
+
+    },
+    "3秒" : {
+
+    },
+    "4秒" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4 seconds"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4秒"
+          }
+        }
+      }
+    },
+    "5回" : {
+
+    },
+    "30" : {
+
+    },
+    "240fps" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "240 fps"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "240fps"
+          }
+        }
+      }
+    },
+    "960フレーム" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "960 frames"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "960フレーム"
+          }
+        }
+      }
+    },
+    "cm" : {
+
+    },
+    "EasyShareCamera" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EasyShareCamera"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "EasyShareCamera"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "x" : {
+
+    },
+    "エラー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "エラー"
+          }
+        }
+      }
+    },
+    "カメラ" : {
+
+    },
+    "カメラを三脚に固定し、ミルククラウンが発生する位置を画面中央に合わせます" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fix the camera on a tripod and align the milk crown position to the center."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カメラを三脚に固定し、ミルククラウンが発生する位置を画面中央に合わせます"
+          }
+        }
+      }
+    },
+    "キャンセル" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンセル"
+          }
+        }
+      }
+    },
+    "ズーム: %@x" : {
+
+    },
+    "フォーカス" : {
+
+    },
+    "フォーカス固定" : {
+
+    },
+    "フレームレート" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frame rate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フレームレート"
+          }
+        }
+      }
+    },
+    "プレビュー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレビュー"
+          }
+        }
+      }
+    },
+    "プレビューを再生できません" : {
+
+    },
+    "プレビューを自動で閉じる" : {
+
+    },
+    "プレビューを表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show preview"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プレビューを表示"
+          }
+        }
+      }
+    },
+    "プレビュー診断表示" : {
+
+    },
+    "ミルククラウン撮影システム" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Milk crown capture system"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ミルククラウン撮影システム"
+          }
+        }
+      }
+    },
+    "もう一度再生" : {
+
+    },
+    "ループ回数" : {
+
+    },
+    "レコード" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "レコード"
+          }
+        }
+      }
+    },
+    "使い方" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How to use"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使い方"
+          }
+        }
+      }
+    },
+    "保存" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存"
+          }
+        }
+      }
+    },
+    "値" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "値"
+          }
+        }
+      }
+    },
+    "光学倍率" : {
+
+    },
+    "再生速度" : {
+
+    },
+    "手動" : {
+
+    },
+    "手動フォーカス" : {
+
+    },
+    "技術仕様" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Specifications"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "技術仕様"
+          }
+        }
+      }
+    },
+    "撮影モード" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capture mode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撮影モード"
+          }
+        }
+      }
+    },
+    "撮影中..." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画中..."
+          }
+        }
+      }
+    },
+    "撮影待機" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撮影待機"
+          }
+        }
+      }
+    },
+    "撮影後プレビュー" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Post-capture preview"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撮影後プレビュー"
+          }
+        }
+      }
+    },
+    "撮影時間" : {
+
+    },
+    "撮影条件" : {
+
+    },
+    "撮影準備" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arm"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撮影準備"
+          }
+        }
+      }
+    },
+    "検知方式" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detection method"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "検知方式"
+          }
+        }
+      }
+    },
+    "水滴を落とすと、赤色LEDが点灯し、自動的に録画が開始されます" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When the drop falls, the red LED lights and recording starts automatically."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "水滴を落とすと、赤色LEDが点灯し、自動的に録画が開始されます"
+          }
+        }
+      }
+    },
+    "注意事項" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "注意事項"
+          }
+        }
+      }
+    },
+    "総フレーム数" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total frames"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "総フレーム数"
+          }
+        }
+      }
+    },
+    "自動" : {
+
+    },
+    "落下時間" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop time"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "落下時間"
+          }
+        }
+      }
+    },
+    "落下距離" : {
+
+    },
+    "落下高さ" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drop height"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "落下高さ"
+          }
+        }
+      }
+    },
+    "設定" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定"
+          }
+        }
+      }
+    },
+    "設定を開く" : {
+
+    },
+    "試し撮影" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test capture"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "試し撮影"
+          }
+        }
+      }
+    },
+    "試し撮影ボタンを表示" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show test capture button"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "試し撮影ボタンを表示"
+          }
+        }
+      }
+    },
+    "赤色LEDの点灯、または試し撮影を押してください" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wait for the red LED, or tap Test Capture"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "赤色LEDの点灯、または試し撮影を押してください"
+          }
+        }
+      }
+    },
+    "赤色LEDの点灯を待っています" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for the red LED"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "赤色LEDの点灯を待っています"
+          }
+        }
+      }
+    },
+    "赤色LEDを撮影領域に配置します（水滴検知センサーと連動）" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Place the red LED in the capture area (linked to the drop sensor)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "赤色LEDを撮影領域に配置します（水滴検知センサーと連動）"
+          }
+        }
+      }
+    },
+    "赤色LED光学検知" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Red LED optical detection"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "赤色LED光学検知"
+          }
+        }
+      }
+    },
+    "連続撮影" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuous"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "連続撮影"
+          }
+        }
+      }
+    },
+    "録画エラー: %@" : {
+      "comment" : "Recording error message",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording error: %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画エラー: %@"
+          }
+        }
+      }
+    },
+    "録画は4秒間自動で行われ、写真ライブラリに保存されます" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording runs for 4 seconds and is saved to Photos."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画は4秒間自動で行われ、写真ライブラリに保存されます"
+          }
+        }
+      }
+    },
+    "録画中..." : {
+
+    },
+    "録画時間" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recording duration"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "録画時間"
+          }
+        }
+      }
+    },
+    "閉じる" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "閉じる"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

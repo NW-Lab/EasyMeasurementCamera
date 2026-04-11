@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "Camera access is required to record the milk crown at 240 fps.";
+"NSPhotoLibraryAddUsageDescription" = "Access is required to save recorded videos to the photo library.";
+"NSPhotoLibraryUsageDescription" = "Access is required to save recorded videos to the photo library.";

@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "ミルククラウンを240fpsで撮影するためにカメラへのアクセスが必要です。";
+"NSPhotoLibraryAddUsageDescription" = "撮影した動画を写真ライブラリに保存するためにアクセスが必要です。";
+"NSPhotoLibraryUsageDescription" = "撮影した動画を写真ライブラリに保存するためにアクセスが必要です。";
