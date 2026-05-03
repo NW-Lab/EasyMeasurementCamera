@@ -1,10 +1,7 @@
+#if 0  // Legacy variant: disabled to avoid duplicate symbols when building v9
+
 #include <SPI.h>
 #include <Adafruit_NeoPixel.h>
-
-// v6.0: Dynamic Brightness Control using TLC5916 Special Mode
-// - Implements functions to enter/exit Special Mode.
-// - Allows setting brightness for each cascaded TLC5916 independently.
-// - Reads an ambient light sensor to adjust LED current dynamically.
 
 // Pin Definitions for Seeed XIAO SAMD21
 const int PHOTO_SENSOR_PIN = A0;      // Photocoupler input for water drop detection
@@ -146,37 +143,51 @@ uint8_t mapLightToBrightness(int lightValue) {
 // -----------------------------------------------------------------------------
 // Main Application Logic
 // -----------------------------------------------------------------------------
-
+void myISR(){
+  Serial.println("Trigger");
+  for(int i=0 ;i<6;i++){
+  //  pixels.setPixelColor(i,255,0,0); //red
+  }
+  pixels.show();
+  delayMicroseconds(8300); // 1/240*2 240FPSで2フレーム
+  
+}
 void setup() {
   Serial.begin(115200);
   while (!Serial);
   Serial.println("Water Drop Trigger v6.0 - Dynamic Brightness");
 
   pinMode(PHOTO_SENSOR_PIN, INPUT_PULLUP);
-  pinMode(AMBIENT_LIGHT_PIN, INPUT);
-  pinMode(TLC_LE_PIN, OUTPUT);
-  pinMode(TLC_OE_PIN, OUTPUT);
-
-  SPI.begin();
+ 
+  //NeoPixel initialize
   pixels.begin();
   pixels.setBrightness(150);
+  pixels.clear();
   pixels.show();
+  //割り込み準備
+  attachInterrupt(digitalPinToInterrupt(PHOTO_SENSOR_PIN), myISR, FALLING); // 割り込み設定
 
-  digitalWrite(TLC_OE_PIN, HIGH);
-  digitalWrite(TLC_LE_PIN, LOW);
-  clearAllLeds();
+  //pinMode(AMBIENT_LIGHT_PIN, INPUT);
+  //pinMode(TLC_LE_PIN, OUTPUT);
+  //pinMode(TLC_OE_PIN, OUTPUT);
+
+  //SPI.begin();
+  
+  //digitalWrite(TLC_OE_PIN, HIGH);
+  //digitalWrite(TLC_LE_PIN, LOW);
+  //clearAllLeds();
 
   // --- Initial Brightness Setting ---
-  int initialLight = analogRead(AMBIENT_LIGHT_PIN);
-  Serial.print("Initial ambient light reading: "); Serial.println(initialLight);
-  uint8_t brightness_cc = mapLightToBrightness(initialLight);
+  //int initialLight = analogRead(AMBIENT_LIGHT_PIN);
+  //Serial.print("Initial ambient light reading: "); Serial.println(initialLight);
+  //uint8_t brightness_cc = mapLightToBrightness(initialLight);
 
   // Construct the configuration code. CM=1, HC=1 for max range.
   // Format: {CC5, CC4, CC3, CC2, CC1, CC0, HC, CM}
-  uint8_t configByte = (brightness_cc << 2) | (1 << 1) | 1;
+  //uint8_t configByte = (brightness_cc << 2) | (1 << 1) | 1;
 
   // Set both drivers to the same initial brightness
-  setBrightness(configByte, configByte);
+  //setBrightness(configByte, configByte);
 
   Serial.println("System Ready.");
 }
@@ -186,30 +197,30 @@ void loop() {
   // during the high-speed capture sequence. It would be set beforehand.
   // This loop demonstrates the principle.
 
-  switch (currentState) {
-    case IDLE:
-      if (digitalRead(PHOTO_SENSOR_PIN) == HIGH) {
-        Serial.println("TRIGGERED!");
-        triggerTime = millis();
-        startRecording();
-        currentState = RECORDING;
-      }
-      break;
+  //switch (currentState) {
+  //  case IDLE:
+  //    if (digitalRead(PHOTO_SENSOR_PIN) == HIGH) {
+  //      Serial.println("TRIGGERED!");
+  //       // triggerTime = millis();
+  //       startRecording();
+  //       currentState = RECORDING;
+  //     }
+  //     break;
 
-    case RECORDING:
-      if (millis() - triggerTime >= LED_ON_DURATION) {
-        stopRecording();
-        currentState = COOLDOWN;
-      }
-      break;
+  //   case RECORDING:
+  //     if (millis() - triggerTime >= LED_ON_DURATION) {
+  //       stopRecording();
+  //       currentState = COOLDOWN;
+  //     }
+  //     break;
 
-    case COOLDOWN:
-      if (millis() - triggerTime >= (LED_ON_DURATION + COOLDOWN_PERIOD)) {
-        currentState = IDLE;
-        Serial.println("Ready for next trigger.");
-      }
-      break;
-  }
+  //   case COOLDOWN:
+  //     if (millis() - triggerTime >= (LED_ON_DURATION + COOLDOWN_PERIOD)) {
+  //       currentState = IDLE;
+  //       Serial.println("Ready for next trigger.");
+  //     }
+  //     break;
+  // }
 }
 
 void startRecording() {
@@ -247,3 +258,5 @@ void clearAllLeds() {
   digitalWrite(TLC_LE_PIN, LOW);
   digitalWrite(TLC_OE_PIN, HIGH);
 }
+
+#endif

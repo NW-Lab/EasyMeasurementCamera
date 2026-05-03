@@ -1,3 +1,5 @@
+#if 0  // Legacy variant: disabled to avoid duplicate symbols when building v9
+
 #include <SPI.h>
 #include <Adafruit_NeoPixel.h>
 
@@ -138,3 +140,5 @@ void clearAllLeds() {
   
   digitalWrite(TLC_OE_PIN, HIGH); // Disable outputs to be safe
 }
+
+#endif

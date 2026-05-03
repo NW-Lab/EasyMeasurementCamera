@@ -1,3 +1,5 @@
+#if 0  // Legacy variant: disabled to avoid duplicate symbols when building v9
+
 #include <SPI.h>
 #include <Adafruit_NeoPixel.h>
 
@@ -223,3 +225,5 @@ uint8_t mapLightToBrightness(int lightValue) {
   int invertedValue = 1023 - lightValue;
   return map(invertedValue, 0, 1023, 0, 63);
 }
+
+#endif

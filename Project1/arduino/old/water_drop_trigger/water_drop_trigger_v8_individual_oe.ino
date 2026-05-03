@@ -1,3 +1,5 @@
+#if 0  // Legacy variant: disabled to avoid duplicate symbols when building v9
+
 #include <SPI.h>
 #include <Adafruit_NeoPixel.h>
 
@@ -124,3 +126,5 @@ void stopRecording() {
 // --- Special Mode functions are omitted for clarity in this version ---
 // They would need to be adapted to use the common LE pin and one of the OE pins
 // for the mode switching sequence.
+
+#endif
